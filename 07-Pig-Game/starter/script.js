@@ -19,8 +19,10 @@ const btnNewGame = document.querySelector(".btn--new");
 const btnRollDice = document.querySelector(".btn--roll");
 const btnHold = document.querySelector(".btn--hold");
 
-const sectionPlayer1 = document.querySelector(".player--0");
-const sectionPlayer2 = document.querySelector(".player--1");
+const sectionPlayer = {
+  1: document.querySelector(".player--0"),
+  2: document.querySelector(".player--1"),
+};
 let activePlayer = 1;
 
 // Reseting game to initial state
@@ -28,14 +30,12 @@ resetGame();
 
 /* ########################### functions declarations ########################### */
 
-// generate random integer number
 function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// reset game to initial state
 function resetGame() {
   // Resetig elements texts
   totalScore[1].textContent = 0;
@@ -47,15 +47,24 @@ function resetGame() {
   if (!diceEl.classList.contains("hidden")) diceEl.classList.add("hidden");
 
   // Resetig active player to player 1
-  if (!sectionPlayer1.classList.contains("player--active"))
-    sectionPlayer1.classList.add("player--active");
-  if (sectionPlayer2.classList.contains("player--active"))
-    sectionPlayer2.classList.remove("player--active");
+  if (!sectionPlayer[1].classList.contains("player--active"))
+    sectionPlayer[1].classList.add("player--active");
+  if (sectionPlayer[2].classList.contains("player--active"))
+    sectionPlayer[2].classList.remove("player--active");
+
+  // activating buttons
+  btnRollDice.disabled = false;
+  btnHold.disabled = false;
+
+  //
+  if (sectionPlayer[1].classList.contains("player--winner"))
+    sectionPlayer[1].classList.remove("player--winner");
+  if (sectionPlayer[2].classList.contains("player--winner"))
+    sectionPlayer[2].classList.remove("player--winner");
 
   activePlayer = 1;
 }
 
-// change current score of active player
 function changeCurrentScore(sum, player) {
   sum === 0
     ? (currentScore[player].textContent = 0)
@@ -69,18 +78,31 @@ function holdScore(player) {
   totalScore[player].textContent =
     Number(totalScore[player].textContent) + acumulatedScore;
   changeCurrentScore(0, player);
+
+  if (Number(totalScore[player].textContent) >= 100) {
+    setWin(player);
+    return;
+  }
+
   changeActivePlayer();
 }
 
-// toggle active player
+function setWin(player) {
+  btnRollDice.disabled = true;
+  btnHold.disabled = true;
+
+  sectionPlayer[player].classList.add("player--winner");
+}
+
+// toogle active player
 function changeActivePlayer() {
-  if (sectionPlayer1.classList.contains("player--active")) {
-    sectionPlayer1.classList.remove("player--active");
-    sectionPlayer2.classList.add("player--active");
+  if (sectionPlayer[1].classList.contains("player--active")) {
+    sectionPlayer[1].classList.remove("player--active");
+    sectionPlayer[2].classList.add("player--active");
     activePlayer = 2;
   } else {
-    sectionPlayer2.classList.remove("player--active");
-    sectionPlayer1.classList.add("player--active");
+    sectionPlayer[2].classList.remove("player--active");
+    sectionPlayer[1].classList.add("player--active");
     activePlayer = 1;
   }
 }
